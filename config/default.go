@@ -88,6 +88,8 @@ func DefaultConfig() Config {
 		// storage
 		LocalStorage: LocalStorage{
 			AllowedDirs: allowedDirs,
+			ServerRoot:  "",
+			LocalRoot:   "",
 		},
 		HTTPStorage: HTTPStorage{
 			Timeout: Duration(time.Second * 60),

@@ -324,6 +324,10 @@ LocalStorage:
   # Whitelist of local directory paths which Funnel is allowed to access.
   AllowedDirs:
     - ./
+  # Path to storage on server optionally replaced by Local root on node
+  DefaultRoot: ""
+  # Path to storage on node optionally replaces root path on server
+  LocalRoot: ""
 
 # HTTPStorage is used to download public files on the web via a GET request.
 HTTPStorage:

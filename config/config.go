@@ -273,6 +273,8 @@ type DynamoDB struct {
 type LocalStorage struct {
 	Disabled    bool
 	AllowedDirs []string
+	ServerRoot  string
+	LocalRoot   string
 }
 
 // Valid validates the LocalStorage configuration

@@ -16,6 +16,8 @@ import (
 // Local provides access to a local-disk storage system.
 type Local struct {
 	allowedDirs []string
+	serverRoot  string
+	localRoot   string
 }
 
 // NewLocal returns a Local instance, configured to limit
@@ -29,12 +31,12 @@ func NewLocal(conf config.LocalStorage) (*Local, error) {
 		}
 		allowed = append(allowed, a)
 	}
-	return &Local{allowed}, nil
+	return &Local{allowedDirs: allowed, serverRoot: conf.ServerRoot, localRoot: conf.LocalRoot}, nil
 }
 
 // Stat returns information about the object at the given storage URL.
 func (local *Local) Stat(ctx context.Context, url string) (*Object, error) {
-	path := getPath(url)
+	path := getLocalPath(getPath(url), local.serverRoot, local.localRoot)
 	info, err := os.Stat(path)
 	if err != nil {
 		return nil, err
@@ -49,7 +51,7 @@ func (local *Local) Stat(ctx context.Context, url string) (*Object, error) {
 
 // List lists the objects at the given url.
 func (local *Local) List(ctx context.Context, url string) ([]*Object, error) {
-	files, err := fsutil.WalkFiles(getPath(url))
+	files, err := fsutil.WalkFiles(getLocalPath(getPath(url), local.serverRoot, local.localRoot))
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +74,7 @@ func (local *Local) List(ctx context.Context, url string) ([]*Object, error) {
 
 // Get copies a file from storage into the given hostPath.
 func (local *Local) Get(ctx context.Context, url, path string) (*Object, error) {
-	err := linkFile(ctx, getPath(url), path)
+	err := linkFile(ctx, getLocalPath(getPath(url), local.serverRoot, local.localRoot), path)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +83,7 @@ func (local *Local) Get(ctx context.Context, url, path string) (*Object, error) 
 
 // Put copies a file from the hostPath into storage.
 func (local *Local) Put(ctx context.Context, url, path string) (*Object, error) {
-	target := getPath(url)
+	target := getLocalPath(getPath(url), local.serverRoot, local.localRoot)
 	err := fsutil.EnsurePath(target)
 	if err != nil {
 		return nil, err
@@ -109,7 +111,7 @@ func (local *Local) UnsupportedOperations(url string) UnsupportedOperations {
 		return AllUnsupported(&ErrUnsupportedProtocol{"localStorage"})
 	}
 
-	path := getPath(url)
+	path := getLocalPath(getPath(url), local.serverRoot, local.localRoot)
 	if !isAllowed(path, local.allowedDirs) {
 		err := fmt.Errorf(
 			"localStorage: can't access file, path is not in allowed directories: %s", url)
@@ -120,6 +122,10 @@ func (local *Local) UnsupportedOperations(url string) UnsupportedOperations {
 
 func getPath(rawurl string) string {
 	return strings.TrimPrefix(rawurl, "file://")
+}
+
+func getLocalPath(defaultPath, serverRoot, localRoot string) string {
+	return strings.Replace(defaultPath, serverRoot, localRoot, 1)
 }
 
 func isAllowed(path string, allowedDirs []string) bool {
