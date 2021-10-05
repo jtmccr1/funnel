@@ -325,7 +325,7 @@ LocalStorage:
   AllowedDirs:
     - ./
   # Path to storage on server optionally replaced by Local root on node
-  DefaultRoot: ""
+  ServerRoot: ""
   # Path to storage on node optionally replaces root path on server
   LocalRoot: ""
 
