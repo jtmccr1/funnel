@@ -373,3 +373,10 @@ FTPStorage:
   Timeout: 10s
   User: "anonymous"
   Password: "anonymous"
+
+SFTPStorage:
+  Disabled: false
+  Timeout: 10s
+  User: "anonymous"
+  Password: "anonymous"
+  Key: ""

@@ -91,6 +91,13 @@ func NewMux(conf config.Config) (*Mux, error) {
 		}
 		mux.Backends = append(mux.Backends, ftp)
 	}
+	if conf.SFTPStorage.Valid() {
+		sftp, err := NewSFTP(conf.SFTPStorage)
+		if err != nil {
+			return mux, fmt.Errorf("failed to config sftp storage backend: %s", err)
+		}
+		mux.Backends = append(mux.Backends, sftp)
+	}
 
 	return mux, nil
 }

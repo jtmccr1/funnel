@@ -80,7 +80,7 @@ func (b *FTP) UnsupportedOperations(url string) UnsupportedOperations {
 }
 
 func (b *FTP) supportsPrefix(url string) error {
-	if !strings.HasPrefix(url, "ftp://") && !strings.HasPrefix(url, "sftp://") {
+	if !strings.HasPrefix(url, "ftp://") {
 		return &ErrUnsupportedProtocol{"ftpStorage"}
 	}
 	return nil
